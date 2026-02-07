@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeChain | Support Center</title>
+    <title>SafeChain | Wallet Status Checker</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script>
@@ -16,6 +16,8 @@
                             dark: '#0f172a',
                             card: '#1e293b',
                             accent: '#3b82f6',
+                            danger: '#ef4444',
+                            success: '#10b981'
                         }
                     }
                 }
@@ -29,88 +31,155 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
     </style>
 </head>
-<body>
+<body class="flex flex-col min-h-screen">
 
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold text-white tracking-wider">SafeChain<span class="text-brand-accent"> Help</span></span>
-                </div>
-                <div>
-                    <a href="#" class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Submit a Ticket</a>
+                <span class="text-xl font-bold text-white tracking-wider">SafeChain<span class="text-brand-accent"> Diagnostics</span></span>
+                <div class="text-xs text-slate-400 border border-slate-700 rounded-full px-3 py-1">
+                    Secure Mode: Active
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="relative bg-slate-900 overflow-hidden">
-        <div class="absolute inset-0">
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 mix-blend-multiply"></div>
-        </div>
-        <div class="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">How can we help you?</h1>
-            <p class="mt-4 text-xl text-slate-400 max-w-3xl mx-auto">Search our knowledge base for solutions to common wallet and transaction issues.</p>
-            <div class="mt-8 max-w-xl mx-auto">
-                <div class="relative group">
-                    <div class="absolute -inset-0.5 bg-brand-accent rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-200"></div>
-                    <input type="text" class="relative w-full bg-slate-800 text-white border border-slate-700 rounded-lg py-4 px-6 focus:outline-none focus:ring-2 focus:ring-brand-accent shadow-xl" placeholder="Search issues (e.g. 'Transaction Stuck', 'Connection Failed')...">
-                    <svg class="absolute right-4 top-4 h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+    <main class="flex-1 flex flex-col justify-center items-center p-4">
+        
+        <div class="w-full max-w-lg">
+            <div class="text-center mb-10">
+                <h1 class="text-3xl font-bold text-white mb-2">Manual Wallet Check</h1>
+                <p class="text-slate-400">Enter your <strong>Public Address</strong> to check for network desynchronization or stuck transactions.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-8 shadow-2xl">
+                
+                <label class="block text-sm font-medium text-slate-300 mb-2">Wallet Address (Starts with 0x...)</label>
+                <div class="relative">
+                    <input type="text" id="walletInput" 
+                        class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg py-3 px-4 focus:ring-2 focus:ring-brand-accent focus:outline-none transition"
+                        placeholder="e.g. 0x71C7656EC7ab88b098defB751B7401B5f6d8976F">
+                    
+                    <div id="statusIcon" class="absolute right-3 top-3 hidden">
+                        </div>
+                </div>
+
+                <div id="feedbackArea" class="mt-3 text-sm min-h-[20px]"></div>
+
+                <button id="checkBtn" class="w-full bg-brand-accent hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mt-6 transition flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                    Run Diagnostic
+                </button>
+
+                <div class="mt-6 pt-6 border-t border-slate-700 flex gap-3">
+                    <svg class="w-6 h-6 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        <strong class="text-slate-300">Security Warning:</strong> Never paste your Seed Phrase (12-24 words) or Private Key. Legitimate support tools only need your Public Address.
+                    </p>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <h2 class="text-2xl font-bold text-white mb-8">Common Troubleshooting Topics</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div id="resultsCard" class="glass-card rounded-2xl p-6 mt-6 hidden border-l-4 border-brand-success">
+                <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-brand-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Diagnostic Complete
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between border-b border-slate-700 pb-2">
+                        <span class="text-slate-400">Network Status:</span>
+                        <span class="text-brand-success font-medium">Operational</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-700 pb-2">
+                        <span class="text-slate-400">Pending Transactions:</span>
+                        <span class="text-white">0 Found</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Wallet Health:</span>
+                        <span class="text-brand-success font-medium">Good</span>
+                    </div>
+                </div>
+                <div class="mt-4 bg-slate-800/50 p-3 rounded text-xs text-slate-400">
+                    No action needed. If you are still experiencing issues, please clear your browser cache.
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const input = document.getElementById('walletInput');
+        const btn = document.getElementById('checkBtn');
+        const feedback = document.getElementById('feedbackArea');
+        const results = document.getElementById('resultsCard');
+
+        // Regex for a standard Ethereum Public Address (Safe)
+        const ethRegex = /^0x[a-fA-F0-9]{40}$/;
+        
+        // Regex to detect Seed Phrases (Unsafe - looks for 3+ words separated by spaces)
+        const seedPhraseRegex = /(\w+\s){2,}\w+/;
+
+        input.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            results.classList.add('hidden'); // Hide results on new input
+
+            // SAFETY CHECK: Detect Seed Phrases
+            if (seedPhraseRegex.test(val)) {
+                feedback.innerHTML = `<span class="text-brand-danger font-bold flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    CRITICAL WARNING: Never paste your Seed Phrase!
+                </span>`;
+                input.classList.add('border-brand-danger', 'shake');
+                input.classList.remove('border-slate-700', 'focus:ring-brand-accent');
+                btn.disabled = true;
+                return;
+            }
+
+            // Clean up danger state
+            input.classList.remove('border-brand-danger', 'shake');
+            input.classList.add('border-slate-700');
+
+            // Validate Public Address
+            if (ethRegex.test(val)) {
+                feedback.innerHTML = `<span class="text-brand-success flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Valid Public Address detected
+                </span>`;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else if (val.length > 0) {
+                feedback.innerText = "Please enter a valid Ethereum address (starts with 0x...)";
+                feedback.className = "mt-3 text-sm text-yellow-500";
+                btn.disabled = true;
+            } else {
+                feedback.innerHTML = "";
+                btn.disabled = true;
+            }
+        });
+
+        btn.addEventListener('click', () => {
+            // Simulation of a "Check" process
+            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing...`;
             
-            <a href="#" class="glass-card p-8 rounded-2xl hover:bg-slate-800 transition group">
-                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">Connection Issues</h3>
-                <p class="text-slate-400 text-sm mb-4">Guides on solving RPC errors, browser extension conflicts, and network timeouts.</p>
-                <span class="text-brand-accent text-sm font-medium flex items-center">View 5 Articles <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
-            </a>
-
-            <a href="#" class="glass-card p-8 rounded-2xl hover:bg-slate-800 transition group">
-                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">Stuck Transactions</h3>
-                <p class="text-slate-400 text-sm mb-4">How to speed up or cancel pending transactions using nonces.</p>
-                <span class="text-brand-accent text-sm font-medium flex items-center">View 3 Articles <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
-            </a>
-
-            <a href="#" class="glass-card p-8 rounded-2xl hover:bg-slate-800 transition group">
-                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition">
-                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                </div>
-                <h3 class="text-xl font-bold text-white mb-2">Security Best Practices</h3>
-                <p class="text-slate-400 text-sm mb-4">Learn how to keep your recovery phrase safe and spot phishing attempts.</p>
-                <span class="text-brand-accent text-sm font-medium flex items-center">View 8 Articles <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
-            </a>
-
-        </div>
-    </div>
-
-    <div class="bg-slate-800 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-2xl font-bold text-white">Still need help?</h2>
-            <p class="text-slate-400 mt-2 mb-6">Our support team is here to assist you via email.</p>
-            <div class="inline-flex rounded-md shadow">
-                <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-brand-accent hover:bg-blue-600">
-                    Open a Support Ticket
-                </a>
-            </div>
-            <p class="mt-4 text-xs text-slate-500 uppercase tracking-widest">
-                <span class="text-red-400 font-bold">Warning:</span> We will never ask for your seed phrase or private key.
-            </p>
-        </div>
-    </div>
-
+            setTimeout(() => {
+                btn.innerHTML = "Run Diagnostic";
+                results.classList.remove('hidden');
+            }, 1500);
+        });
+    </script>
 </body>
 </html>
