@@ -24,15 +24,57 @@
             width: 100%;
         }
         h1 { margin-bottom: 24px; color: #333; }
+        
+        /* Status Box */
         .status {
             margin-top: 20px;
-            padding: 12px;
+            padding: 15px;
             background-color: #e6f7ff;
             border-radius: 12px;
             display: none; /* Hidden by default */
+            border: 1px solid #b3e0ff;
         }
-        p { word-break: break-all; color: #555; font-size: 14px; }
-        .success-icon { font-size: 24px; margin-bottom: 8px; }
+        .address { 
+            word-break: break-all; 
+            color: #0050b3; 
+            font-family: monospace; 
+            font-size: 14px; 
+            margin-top: 8px;
+        }
+        
+        /* Action Area (New!) */
+        .action-area {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            display: none; /* Hidden by default */
+        }
+        .sign-btn {
+            background-color: #3396FF;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        .sign-btn:hover { background-color: #2878CC; }
+        .sign-btn:active { transform: scale(0.98); }
+
+        .signature-result {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #28a745;
+            word-break: break-all;
+            display: none;
+            background: #f0fff4;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #b7eb8f;
+        }
     </style>
 </head>
 <body>
@@ -42,20 +84,26 @@
     
     <w3m-button></w3m-button>
 
-    <div id="status-area" class="status">
-        <div class="success-icon">✅</div>
-        <p><strong>Wallet Connected!</strong></p>
-        <p id="wallet-address">Loading...</p>
+    <div id="status-box" class="status">
+        <strong>✅ Wallet Connected!</strong>
+        <div id="wallet-address" class="address">Loading...</div>
+    </div>
+
+    <div id="action-area" class="action-area">
+        <button id="sign-btn" class="sign-btn">
+            🖊️ Sign "Hello World"
+        </button>
+        <div id="signature-result" class="signature-result"></div>
     </div>
 </div>
 
 <script type="module">
-    // 1. Import the necessary functions from the CDN
     import { createWeb3Modal, defaultConfig } from 'https://esm.sh/@web3modal/ethers@4.1.0'
     import { BrowserProvider } from 'https://esm.sh/ethers@6.10.0'
 
-    // 2. Configuration
-    const projectId = '69ae211f46b853f0ebdde4f3af8685e0' // Get your own at cloud.walletconnect.com
+    // --- CONFIGURATION ---
+    // 1. Paste your own Project ID here if you have one
+    const projectId = 'f3dc106518477f154a4341b52589531d' 
 
     const mainnet = {
         chainId: 1,
@@ -66,13 +114,13 @@
     }
 
     const metadata = {
-        name: 'My HTML DApp',
-        description: 'A pure HTML/JS WalletConnect Example',
+        name: 'My JS DApp',
+        description: 'Authentication Example',
         url: 'https://my-dapp.com', 
         icons: ['https://avatars.githubusercontent.com/u/37784886']
     }
 
-    // 3. Initialize the Modal
+    // --- INITIALIZATION ---
     const modal = createWeb3Modal({
         ethersConfig: defaultConfig({ metadata }),
         chains: [mainnet],
@@ -80,24 +128,62 @@
         enableAnalytics: true
     })
 
-    // 4. Listen for Connection Events to update the UI
-    const statusArea = document.getElementById('status-area')
+    // --- DOM ELEMENTS ---
+    const statusBox = document.getElementById('status-box')
     const addressLabel = document.getElementById('wallet-address')
+    const actionArea = document.getElementById('action-area')
+    const signBtn = document.getElementById('sign-btn')
+    const sigResult = document.getElementById('signature-result')
 
-    // Subscribe to state changes (Connect/Disconnect)
-    modal.subscribeProvider(async ({ address, isConnected }) => {
+    // --- EVENT LISTENERS ---
+    
+    // 1. Watch for Connection
+    modal.subscribeProvider(({ address, isConnected }) => {
         if (isConnected && address) {
-            statusArea.style.display = 'block'
+            statusBox.style.display = 'block'
+            actionArea.style.display = 'block'
             addressLabel.textContent = address
-            console.log("Safe Connection Established:", address)
+            sigResult.style.display = 'none' // Reset previous signature
         } else {
-            statusArea.style.display = 'none'
+            statusBox.style.display = 'none'
+            actionArea.style.display = 'none'
             addressLabel.textContent = ''
-            console.log("Disconnected")
+        }
+    })
+
+    // 2. Handle Signing
+    signBtn.addEventListener('click', async () => {
+        signBtn.textContent = "Check your wallet..."
+        signBtn.disabled = true
+        sigResult.style.display = 'none'
+
+        try {
+            // A. Get the connection to the wallet
+            const walletProvider = modal.getWalletProvider()
+            if (!walletProvider) throw new Error("User disconnected")
+
+            // B. Wrap it in Ethers.js to make it easy to use
+            const provider = new BrowserProvider(walletProvider)
+            const signer = await provider.getSigner()
+
+            // C. Send the request
+            const signature = await signer.signMessage("Hello World! I verify this is me.")
+
+            // D. Success!
+            console.log("Signed:", signature)
+            sigResult.textContent = "✨ Success! Signature: " + signature.substring(0, 30) + "..."
+            sigResult.style.display = 'block'
+            signBtn.textContent = "Signed!"
+
+        } catch (error) {
+            console.error(error)
+            signBtn.textContent = "Try Again"
+            alert("Request rejected or failed. Check console for details.")
+        } finally {
+            signBtn.disabled = false
         }
     })
 </script>
 
 </body>
 </html>
-
