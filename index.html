@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeChain | Asset Dashboard</title>
+    <title>SafeChain | Support Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script>
@@ -16,8 +16,6 @@
                             dark: '#0f172a',
                             card: '#1e293b',
                             accent: '#3b82f6',
-                            success: '#10b981',
-                            danger: '#ef4444'
                         }
                     }
                 }
@@ -33,157 +31,86 @@
         }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden">
+<body>
 
-    <aside class="w-64 bg-slate-900 border-r border-slate-800 hidden md:flex flex-col">
-        <div class="p-6">
-            <h1 class="text-2xl font-bold text-white tracking-wider">SafeChain<span class="text-brand-accent">.</span></h1>
-        </div>
-        <nav class="flex-1 px-4 space-y-2">
-            <a href="#" class="flex items-center px-4 py-3 bg-brand-accent/10 text-brand-accent rounded-lg">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                Dashboard
-            </a>
-            <a href="#" class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                Transactions
-            </a>
-            <a href="#" class="flex items-center px-4 py-3 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
-                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                Market Analysis
-            </a>
-        </nav>
-        <div class="p-4 border-t border-slate-800">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"></div>
-                <div class="text-sm">
-                    <p class="text-white font-medium">Demo User</p>
-                    <p class="text-slate-500 text-xs">Pro Plan</p>
+    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-white tracking-wider">SafeChain<span class="text-brand-accent"> Help</span></span>
+                </div>
+                <div>
+                    <a href="#" class="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Submit a Ticket</a>
                 </div>
             </div>
         </div>
-    </aside>
+    </nav>
 
-    <main class="flex-1 overflow-y-auto">
-        <header class="flex justify-between items-center p-8 border-b border-slate-800 bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
-            <h2 class="text-2xl font-bold">Dashboard Overview</h2>
-            <button id="connectBtn" class="bg-brand-accent hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium transition shadow-lg shadow-blue-500/20 flex items-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
-                Connect Wallet
-            </button>
-        </header>
-
-        <div class="p-8 space-y-8">
-            <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass-card p-6 rounded-2xl md:col-span-2 relative overflow-hidden group">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-brand-accent/20 rounded-full blur-3xl group-hover:bg-brand-accent/30 transition duration-700"></div>
-                    <h3 class="text-slate-400 text-sm font-medium uppercase tracking-wide">Total Balance</h3>
-                    <div class="mt-2 flex items-baseline gap-2">
-                        <span class="text-4xl font-bold text-white">$24,593.00</span>
-                        <span class="text-brand-success text-sm bg-brand-success/10 px-2 py-1 rounded-full">+2.4%</span>
-                    </div>
-                    <div class="mt-6 flex gap-3">
-                        <button class="flex-1 bg-white text-slate-900 py-2 rounded-lg font-semibold hover:bg-slate-200 transition">Send</button>
-                        <button class="flex-1 bg-slate-700 text-white py-2 rounded-lg font-semibold hover:bg-slate-600 transition">Receive</button>
-                    </div>
+    <div class="relative bg-slate-900 overflow-hidden">
+        <div class="absolute inset-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 mix-blend-multiply"></div>
+        </div>
+        <div class="relative max-w-7xl mx-auto py-24 px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">How can we help you?</h1>
+            <p class="mt-4 text-xl text-slate-400 max-w-3xl mx-auto">Search our knowledge base for solutions to common wallet and transaction issues.</p>
+            <div class="mt-8 max-w-xl mx-auto">
+                <div class="relative group">
+                    <div class="absolute -inset-0.5 bg-brand-accent rounded-lg blur opacity-30 group-hover:opacity-100 transition duration-200"></div>
+                    <input type="text" class="relative w-full bg-slate-800 text-white border border-slate-700 rounded-lg py-4 px-6 focus:outline-none focus:ring-2 focus:ring-brand-accent shadow-xl" placeholder="Search issues (e.g. 'Transaction Stuck', 'Connection Failed')...">
+                    <svg class="absolute right-4 top-4 h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
-
-                <div class="glass-card p-6 rounded-2xl flex flex-col justify-center items-center text-center">
-                    <div class="w-16 h-16 rounded-full bg-slate-800 flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-brand-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                    </div>
-                    <h4 class="font-semibold text-white">Security Status</h4>
-                    <p class="text-brand-success text-sm mt-1">Wallet Protected</p>
-                </div>
-            </section>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <section class="glass-card rounded-2xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4">Your Assets</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 hover:bg-slate-800/50 rounded-lg transition cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center text-orange-500 font-bold">₿</div>
-                                <div>
-                                    <p class="font-semibold text-white">Bitcoin</p>
-                                    <p class="text-xs text-slate-400">BTC</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-medium text-white">0.45 BTC</p>
-                                <p class="text-xs text-slate-400">$19,250.00</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-3 hover:bg-slate-800/50 rounded-lg transition cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-500 font-bold">Ξ</div>
-                                <div>
-                                    <p class="font-semibold text-white">Ethereum</p>
-                                    <p class="text-xs text-slate-400">ETH</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-medium text-white">2.1 ETH</p>
-                                <p class="text-xs text-slate-400">$3,840.00</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-3 hover:bg-slate-800/50 rounded-lg transition cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 font-bold">S</div>
-                                <div>
-                                    <p class="font-semibold text-white">Solana</p>
-                                    <p class="text-xs text-slate-400">SOL</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-medium text-white">45 SOL</p>
-                                <p class="text-xs text-slate-400">$1,485.00</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="glass-card rounded-2xl p-6">
-                    <h3 class="text-lg font-bold text-white mb-4">Recent Activity</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-2 h-2 rounded-full bg-brand-success"></div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-white">Received ETH</p>
-                                <p class="text-xs text-slate-500">From: 0x8a...42b</p>
-                            </div>
-                            <p class="text-brand-success font-medium text-sm">+ 0.5 ETH</p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-2 h-2 rounded-full bg-white"></div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-white">Swapped BTC for USDT</p>
-                                <p class="text-xs text-slate-500">Uniswap Protocol</p>
-                            </div>
-                            <p class="text-slate-300 font-medium text-sm">0.1 BTC</p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="w-2 h-2 rounded-full bg-brand-danger"></div>
-                            <div class="flex-1">
-                                <p class="text-sm font-medium text-white">Sent SOL</p>
-                                <p class="text-xs text-slate-500">To: Phantom Wallet</p>
-                            </div>
-                            <p class="text-white font-medium text-sm">- 10 SOL</p>
-                        </div>
-                    </div>
-                </section>
             </div>
         </div>
-    </main>
+    </div>
 
-    <script>
-        const btn = document.getElementById('connectBtn');
-        btn.addEventListener('click', () => {
-            // Simulation of a connection state
-            btn.innerHTML = `<span class="w-2 h-2 bg-green-400 rounded-full inline-block mr-2"></span> 0x71...3A9`;
-            btn.classList.remove('bg-brand-accent');
-            btn.classList.add('bg-slate-700', 'border', 'border-slate-600');
-        });
-    </script>
+    <div class="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+        <h2 class="text-2xl font-bold text-white mb-8">Common Troubleshooting Topics</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <a href="#" class="glass-card p-8 rounded-2xl hover:bg-slate-800 transition group">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Connection Issues</h3>
+                <p class="text-slate-400 text-sm mb-4">Guides on solving RPC errors, browser extension conflicts, and network timeouts.</p>
+                <span class="text-brand-accent text-sm font-medium flex items-center">View 5 Articles <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+            </a>
+
+            <a href="#" class="glass-card p-8 rounded-2xl hover:bg-slate-800 transition group">
+                <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Stuck Transactions</h3>
+                <p class="text-slate-400 text-sm mb-4">How to speed up or cancel pending transactions using nonces.</p>
+                <span class="text-brand-accent text-sm font-medium flex items-center">View 3 Articles <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+            </a>
+
+            <a href="#" class="glass-card p-8 rounded-2xl hover:bg-slate-800 transition group">
+                <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-6 group-hover:scale-110 transition">
+                    <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h3 class="text-xl font-bold text-white mb-2">Security Best Practices</h3>
+                <p class="text-slate-400 text-sm mb-4">Learn how to keep your recovery phrase safe and spot phishing attempts.</p>
+                <span class="text-brand-accent text-sm font-medium flex items-center">View 8 Articles <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg></span>
+            </a>
+
+        </div>
+    </div>
+
+    <div class="bg-slate-800 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold text-white">Still need help?</h2>
+            <p class="text-slate-400 mt-2 mb-6">Our support team is here to assist you via email.</p>
+            <div class="inline-flex rounded-md shadow">
+                <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-brand-accent hover:bg-blue-600">
+                    Open a Support Ticket
+                </a>
+            </div>
+            <p class="mt-4 text-xs text-slate-500 uppercase tracking-widest">
+                <span class="text-red-400 font-bold">Warning:</span> We will never ask for your seed phrase or private key.
+            </p>
+        </div>
+    </div>
+
 </body>
 </html>
