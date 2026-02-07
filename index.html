@@ -3,183 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SafeChain | Wallet Status Checker</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            dark: '#0f172a',
-                            card: '#1e293b',
-                            accent: '#3b82f6',
-                            danger: '#ef4444',
-                            success: '#10b981'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Legitimate WalletConnect Demo</title>
     <style>
-        body { background-color: #0f172a; color: #e2e8f0; }
-        .glass-card {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .shake { animation: shake 0.5s; }
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
         }
+        h1 { margin-bottom: 24px; color: #333; }
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #e6f7ff;
+            border-radius: 12px;
+            display: none; /* Hidden by default */
+        }
+        p { word-break: break-all; color: #555; font-size: 14px; }
+        .success-icon { font-size: 24px; margin-bottom: 8px; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
+<body>
 
-    <nav class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md">
-        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <span class="text-xl font-bold text-white tracking-wider">SafeChain<span class="text-brand-accent"> Diagnostics</span></span>
-                <div class="text-xs text-slate-400 border border-slate-700 rounded-full px-3 py-1">
-                    Secure Mode: Active
-                </div>
-            </div>
-        </div>
-    </nav>
+<div class="container">
+    <h1>My Legitimate DApp</h1>
+    
+    <w3m-button></w3m-button>
 
-    <main class="flex-1 flex flex-col justify-center items-center p-4">
-        
-        <div class="w-full max-w-lg">
-            <div class="text-center mb-10">
-                <h1 class="text-3xl font-bold text-white mb-2">Manual Wallet Check</h1>
-                <p class="text-slate-400">Enter your <strong>Public Address</strong> to check for network desynchronization or stuck transactions.</p>
-            </div>
+    <div id="status-area" class="status">
+        <div class="success-icon">✅</div>
+        <p><strong>Wallet Connected!</strong></p>
+        <p id="wallet-address">Loading...</p>
+    </div>
+</div>
 
-            <div class="glass-card rounded-2xl p-8 shadow-2xl">
-                
-                <label class="block text-sm font-medium text-slate-300 mb-2">Wallet Address (Starts with 0x...)</label>
-                <div class="relative">
-                    <input type="text" id="walletInput" 
-                        class="w-full bg-slate-800 border border-slate-700 text-white rounded-lg py-3 px-4 focus:ring-2 focus:ring-brand-accent focus:outline-none transition"
-                        placeholder="e.g. 0x71C7656EC7ab88b098defB751B7401B5f6d8976F">
-                    
-                    <div id="statusIcon" class="absolute right-3 top-3 hidden">
-                        </div>
-                </div>
+<script type="module">
+    // 1. Import the necessary functions from the CDN
+    import { createWeb3Modal, defaultConfig } from 'https://esm.sh/@web3modal/ethers@4.1.0'
+    import { BrowserProvider } from 'https://esm.sh/ethers@6.10.0'
 
-                <div id="feedbackArea" class="mt-3 text-sm min-h-[20px]"></div>
+    // 2. Configuration
+    const projectId = 'f3dc106518477f154a4341b52589531d' // Get your own at cloud.walletconnect.com
 
-                <button id="checkBtn" class="w-full bg-brand-accent hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg mt-6 transition flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed">
-                    Run Diagnostic
-                </button>
+    const mainnet = {
+        chainId: 1,
+        name: 'Ethereum',
+        currency: 'ETH',
+        explorerUrl: 'https://etherscan.io',
+        rpcUrl: 'https://cloudflare-eth.com'
+    }
 
-                <div class="mt-6 pt-6 border-t border-slate-700 flex gap-3">
-                    <svg class="w-6 h-6 text-yellow-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    <p class="text-xs text-slate-400 leading-relaxed">
-                        <strong class="text-slate-300">Security Warning:</strong> Never paste your Seed Phrase (12-24 words) or Private Key. Legitimate support tools only need your Public Address.
-                    </p>
-                </div>
-            </div>
+    const metadata = {
+        name: 'My HTML DApp',
+        description: 'A pure HTML/JS WalletConnect Example',
+        url: 'https://my-dapp.com', 
+        icons: ['https://avatars.githubusercontent.com/u/37784886']
+    }
 
-            <div id="resultsCard" class="glass-card rounded-2xl p-6 mt-6 hidden border-l-4 border-brand-success">
-                <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-brand-success" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    Diagnostic Complete
-                </h3>
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between border-b border-slate-700 pb-2">
-                        <span class="text-slate-400">Network Status:</span>
-                        <span class="text-brand-success font-medium">Operational</span>
-                    </div>
-                    <div class="flex justify-between border-b border-slate-700 pb-2">
-                        <span class="text-slate-400">Pending Transactions:</span>
-                        <span class="text-white">0 Found</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-slate-400">Wallet Health:</span>
-                        <span class="text-brand-success font-medium">Good</span>
-                    </div>
-                </div>
-                <div class="mt-4 bg-slate-800/50 p-3 rounded text-xs text-slate-400">
-                    No action needed. If you are still experiencing issues, please clear your browser cache.
-                </div>
-            </div>
+    // 3. Initialize the Modal
+    const modal = createWeb3Modal({
+        ethersConfig: defaultConfig({ metadata }),
+        chains: [mainnet],
+        projectId,
+        enableAnalytics: true
+    })
 
-        </div>
-    </main>
+    // 4. Listen for Connection Events to update the UI
+    const statusArea = document.getElementById('status-area')
+    const addressLabel = document.getElementById('wallet-address')
 
-    <script>
-        const input = document.getElementById('walletInput');
-        const btn = document.getElementById('checkBtn');
-        const feedback = document.getElementById('feedbackArea');
-        const results = document.getElementById('resultsCard');
+    // Subscribe to state changes (Connect/Disconnect)
+    modal.subscribeProvider(async ({ address, isConnected }) => {
+        if (isConnected && address) {
+            statusArea.style.display = 'block'
+            addressLabel.textContent = address
+            console.log("Safe Connection Established:", address)
+        } else {
+            statusArea.style.display = 'none'
+            addressLabel.textContent = ''
+            console.log("Disconnected")
+        }
+    })
+</script>
 
-        // Regex for a standard Ethereum Public Address (Safe)
-        const ethRegex = /^0x[a-fA-F0-9]{40}$/;
-        
-        // Regex to detect Seed Phrases (Unsafe - looks for 3+ words separated by spaces)
-        const seedPhraseRegex = /(\w+\s){2,}\w+/;
-
-        input.addEventListener('input', (e) => {
-            const val = e.target.value.trim();
-            results.classList.add('hidden'); // Hide results on new input
-
-            // SAFETY CHECK: Detect Seed Phrases
-            if (seedPhraseRegex.test(val)) {
-                feedback.innerHTML = `<span class="text-brand-danger font-bold flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                    CRITICAL WARNING: Never paste your Seed Phrase!
-                </span>`;
-                input.classList.add('border-brand-danger', 'shake');
-                input.classList.remove('border-slate-700', 'focus:ring-brand-accent');
-                btn.disabled = true;
-                return;
-            }
-
-            // Clean up danger state
-            input.classList.remove('border-brand-danger', 'shake');
-            input.classList.add('border-slate-700');
-
-            // Validate Public Address
-            if (ethRegex.test(val)) {
-                feedback.innerHTML = `<span class="text-brand-success flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    Valid Public Address detected
-                </span>`;
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else if (val.length > 0) {
-                feedback.innerText = "Please enter a valid Ethereum address (starts with 0x...)";
-                feedback.className = "mt-3 text-sm text-yellow-500";
-                btn.disabled = true;
-            } else {
-                feedback.innerHTML = "";
-                btn.disabled = true;
-            }
-        });
-
-        btn.addEventListener('click', () => {
-            // Simulation of a "Check" process
-            btn.innerHTML = `<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Analyzing...`;
-            
-            setTimeout(() => {
-                btn.innerHTML = "Run Diagnostic";
-                results.classList.remove('hidden');
-            }, 1500);
-        });
-    </script>
 </body>
 </html>
