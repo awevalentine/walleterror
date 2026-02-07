@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legitimate WalletConnect Demo</title>
+    <title>Smart Network DApp</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -23,8 +23,21 @@
             max-width: 400px;
             width: 100%;
         }
-        h1 { margin-bottom: 24px; color: #333; }
+        h1 { margin-bottom: 10px; color: #333; }
         
+        /* New Network Badge */
+        .network-badge {
+            display: inline-block;
+            background: #eee;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .network-badge.active { background: #e6f7ff; color: #0077cc; border: 1px solid #bae7ff; }
+
         .status {
             margin-top: 20px;
             padding: 12px;
@@ -40,17 +53,13 @@
             font-size: 14px; 
         }
 
-        /* Payment Section Styles */
         .payment-area {
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #eee;
             display: none;
         }
-        .input-group {
-            margin-bottom: 15px;
-            text-align: left;
-        }
+        .input-group { margin-bottom: 15px; text-align: left; }
         label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
         input {
             width: 100%;
@@ -61,7 +70,7 @@
             font-size: 16px;
         }
         .send-btn {
-            background-color: #10B981; /* Green for money */
+            background-color: #10B981;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -73,25 +82,14 @@
             transition: background 0.2s;
         }
         .send-btn:hover { background-color: #059669; }
-        .send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
-
-        .tx-result {
-            margin-top: 15px;
-            font-size: 12px;
-            color: #666;
-            word-break: break-all;
-            display: none;
-            background: #f9fafb;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .tx-link { color: #10B981; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Legitimate Payments</h1>
+    <h1>My DApp</h1>
+    
+    <div id="network-badge" class="network-badge">Not Connected</div>
     
     <w3m-button></w3m-button>
 
@@ -104,17 +102,15 @@
         <div class="input-group">
             <label>Recipient Address</label>
             <input type="text" id="to-address" placeholder="0x..." value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045">
-            </div>
+        </div>
         <div class="input-group">
-            <label>Amount (ETH)</label>
+            <label id="currency-label">Amount (ETH)</label>
             <input type="number" id="amount" placeholder="0.001" step="0.0001" value="0.0001">
         </div>
         
         <button id="send-btn" class="send-btn">
-            💸 Send Transaction
+            💸 Send Payment
         </button>
-        
-        <div id="tx-result" class="tx-result"></div>
     </div>
 </div>
 
@@ -124,97 +120,91 @@
 
     const projectId = 'f3dc106518477f154a4341b52589531d'
 
-    // We allow both Mainnet and Sepolia (Testnet)
+    // 3. Define Networks with their Currencies
     const mainnet = { chainId: 1, name: 'Ethereum', currency: 'ETH', explorerUrl: 'https://etherscan.io', rpcUrl: 'https://cloudflare-eth.com' }
-    const sepolia = { chainId: 11155111, name: 'Sepolia', currency: 'SepoliaETH', explorerUrl: 'https://sepolia.etherscan.io', rpcUrl: 'https://rpc.sepolia.org' }
+    const polygon = { chainId: 137, name: 'Polygon', currency: 'MATIC', explorerUrl: 'https://polygonscan.com', rpcUrl: 'https://polygon-rpc.com' }
+    const bsc = { chainId: 56, name: 'BNB Smart Chain', currency: 'BNB', explorerUrl: 'https://bscscan.com', rpcUrl: 'https://binance.onfinality.io/public' }
 
     const metadata = {
-        name: 'My Payment DApp',
-        description: 'Sending Transaction Example',
+        name: 'Smart Network DApp',
+        description: 'Auto-updating currency example',
         url: 'https://my-dapp.com', 
         icons: ['https://avatars.githubusercontent.com/u/37784886']
     }
 
     const modal = createWeb3Modal({
         ethersConfig: defaultConfig({ metadata }),
-        chains: [mainnet, sepolia],
+        chains: [mainnet, polygon, bsc], // Supports ETH, Polygon, and BSC
         projectId,
         enableAnalytics: true
     })
 
-    // Elements
+    // UI Elements
     const statusBox = document.getElementById('status-box')
     const addressLabel = document.getElementById('wallet-address')
     const paymentArea = document.getElementById('payment-area')
+    const networkBadge = document.getElementById('network-badge')
+    const currencyLabel = document.getElementById('currency-label')
     const sendBtn = document.getElementById('send-btn')
-    const toInput = document.getElementById('to-address')
-    const amountInput = document.getElementById('amount')
-    const txResult = document.getElementById('tx-result')
 
-    // Connection Listener
-    modal.subscribeProvider(({ address, isConnected }) => {
+    // 4. Helper Function to Update UI
+    function updateNetworkUI(chainId) {
+        if (!chainId) {
+            networkBadge.innerText = "Not Connected"
+            networkBadge.className = "network-badge"
+            return
+        }
+
+        // Find which network we are on
+        let networkName = "Unknown Network"
+        let symbol = "Tokens"
+
+        if (chainId === 1) { networkName = "Ethereum"; symbol = "ETH"; }
+        else if (chainId === 137) { networkName = "Polygon"; symbol = "MATIC"; }
+        else if (chainId === 56) { networkName = "BSC"; symbol = "BNB"; }
+
+        // Update the screen
+        networkBadge.innerText = `📡 ${networkName}`
+        networkBadge.className = "network-badge active"
+        currencyLabel.innerText = `Amount (${symbol})`
+        sendBtn.innerText = `💸 Send ${symbol}`
+    }
+
+    // 5. Advanced Listener (Watches for Address AND Chain changes)
+    modal.subscribeProvider(({ address, isConnected, chainId }) => {
         if (isConnected && address) {
             statusBox.style.display = 'block'
             paymentArea.style.display = 'block'
             addressLabel.textContent = address
+            
+            // Run our new network update logic
+            updateNetworkUI(chainId)
         } else {
             statusBox.style.display = 'none'
             paymentArea.style.display = 'none'
+            updateNetworkUI(null)
         }
     })
 
-    // Sending Logic
+    // Send Logic (Same as before)
     sendBtn.addEventListener('click', async () => {
-        const to = toInput.value
-        const amount = amountInput.value
-        
-        if(!to || !amount) return alert("Please fill in address and amount")
-
-        sendBtn.innerText = "Check Phone..."
-        sendBtn.disabled = true
-        txResult.style.display = 'none'
+        const to = document.getElementById('to-address').value
+        const amount = document.getElementById('amount').value
+        if(!to || !amount) return alert("Please fill in fields")
 
         try {
-            // 1. Get Provider & Signer
             const walletProvider = modal.getWalletProvider()
             const provider = new BrowserProvider(walletProvider)
             const signer = await provider.getSigner()
-
-            // 2. Prepare the Transaction
-            const txParams = {
-                to: to,
-                value: parseEther(amount) // Converts "0.001" string to Wei (BigInt)
-            }
-
-            // 3. Send Transaction (This triggers the wallet popup)
-            console.log("Sending transaction...")
-            const txResponse = await signer.sendTransaction(txParams)
-
-            // 4. Show success immediately after user approves
-            console.log("Tx Sent!", txResponse)
             
-            txResult.innerHTML = `
-                ✅ <strong>Transaction Sent!</strong><br>
-                Hash: <a href="https://etherscan.io/tx/${txResponse.hash}" target="_blank" class="tx-link">
-                    ${txResponse.hash.substring(0, 10)}...
-                </a>
-            `
-            txResult.style.display = 'block'
-            sendBtn.innerText = "Send Another"
-
+            const tx = await signer.sendTransaction({
+                to: to,
+                value: parseEther(amount)
+            })
+            alert(`✅ Transaction Sent! Hash: ${tx.hash}`)
         } catch (error) {
             console.error(error)
-            // Handle "User rejected" vs "Insufficient funds"
-            if (error.code === 'ACTION_REJECTED') {
-                alert("You rejected the transaction on your phone.")
-            } else if (error.code === 'INSUFFICIENT_FUNDS') {
-                alert("Not enough ETH to pay for gas + value.")
-            } else {
-                alert("Transaction failed: " + error.message)
-            }
-            sendBtn.innerText = "💸 Send Transaction"
-        } finally {
-            sendBtn.disabled = false
+            alert("Transaction cancelled or failed.")
         }
     })
 </script>
