@@ -3,100 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Network DApp</title>
+    <title>Crypto Pay</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
+        /* --- 1. MODERN VARIABLES & RESET --- */
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+            --error: #ef4444;
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+        
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at top left, #1e293b, #0f172a);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             margin: 0;
+            padding: 20px;
         }
+
+        /* --- 2. GLASS CARD CONTAINER --- */
         .container {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+            background: var(--card-bg);
+            backdrop-filter: blur(12px); /* The "Glass" Effect */
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 420px;
+            width: 100%;
             text-align: center;
-            max-width: 400px;
-            width: 100%;
         }
-        h1 { margin-bottom: 10px; color: #333; }
+
+        h1 { margin: 0 0 8px 0; font-size: 28px; letter-spacing: -0.5px; }
+        p.subtitle { margin: 0 0 24px 0; color: var(--text-muted); font-size: 14px; }
+
+        /* --- 3. BADGES --- */
+        .badges { 
+            display: flex; 
+            justify-content: center; 
+            gap: 12px; 
+            margin-bottom: 30px; 
+        }
         
-        /* New Network Badge */
-        .network-badge {
-            display: inline-block;
-            background: #eee;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            color: #666;
-            margin-bottom: 20px;
+        .badge { 
+            background: rgba(255,255,255,0.05); 
+            padding: 6px 12px; 
+            border-radius: 100px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
-        .network-badge.active { background: #e6f7ff; color: #0077cc; border: 1px solid #bae7ff; }
+        
+        .badge.active { 
+            background: rgba(59, 130, 246, 0.1); 
+            color: #60a5fa; 
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        
+        .badge.dot::before {
+            content: '';
+            display: block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
 
-        .status {
-            margin-top: 20px;
-            padding: 12px;
-            background-color: #e6f7ff;
-            border-radius: 12px;
-            display: none;
-            border: 1px solid #b3e0ff;
-        }
-        .address { 
-            word-break: break-all; 
-            color: #0050b3; 
-            font-family: monospace; 
-            font-size: 14px; 
+        /* --- 4. INPUT FIELDS --- */
+        .payment-area { 
+            margin-top: 30px; 
+            display: none; 
+            animation: fadeIn 0.5s ease;
         }
 
-        .payment-area {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-            display: none;
+        .input-group { margin-bottom: 20px; text-align: left; }
+        
+        label { 
+            display: block; 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--text-muted); 
+            margin-bottom: 8px; 
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .input-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 16px;
+        
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            background: rgba(0,0,0,0.2); 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            color: white; 
+            font-size: 16px; 
+            outline: none;
         }
-        .send-btn {
-            background-color: #10B981;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: background 0.2s;
+        
+        input:focus { 
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); 
         }
-        .send-btn:hover { background-color: #059669; }
+
+        /* --- 5. ACTION BUTTON --- */
+        .send-btn { 
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover)); 
+            color: white; 
+            border: none; 
+            padding: 16px; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            width: 100%; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+        
+        .send-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4); 
+        }
+        
+        .send-btn:active { transform: translateY(0); }
+
+        /* Animation Keyframes */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>My DApp</h1>
+    <h1>Crypto Pay</h1>
+    <p class="subtitle">Secure Multi-Chain Payments</p>
     
-    <div id="network-badge" class="network-badge">Not Connected</div>
+    <div class="badges">
+        <div id="status-badge" class="badge dot">Disconnected</div>
+        <div id="net-badge" class="badge">Unknown Net</div>
+    </div>
     
     <w3m-button></w3m-button>
-
-    <div id="status-box" class="status">
-        <strong>✅ Connected</strong>
-        <div id="wallet-address" class="address">...</div>
-    </div>
 
     <div id="payment-area" class="payment-area">
         <div class="input-group">
@@ -104,13 +166,11 @@
             <input type="text" id="to-address" placeholder="0x..." value="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045">
         </div>
         <div class="input-group">
-            <label id="currency-label">Amount (ETH)</label>
-            <input type="number" id="amount" placeholder="0.001" step="0.0001" value="0.0001">
+            <label id="currency-label">Amount</label>
+            <input type="number" id="amount" placeholder="0.00" step="0.0001">
         </div>
         
-        <button id="send-btn" class="send-btn">
-            💸 Send Payment
-        </button>
+        <button id="send-btn" class="send-btn">Send Payment</button>
     </div>
 </div>
 
@@ -118,81 +178,94 @@
     import { createWeb3Modal, defaultConfig } from 'https://esm.sh/@web3modal/ethers@4.1.0'
     import { BrowserProvider, parseEther } from 'https://esm.sh/ethers@6.10.0'
 
+    // --- CONFIGURATION ---
     const projectId = 'f3dc106518477f154a4341b52589531d'
 
-    // 3. Define Networks with their Currencies
-    const mainnet = { chainId: 1, name: 'Ethereum', currency: 'ETH', explorerUrl: 'https://etherscan.io', rpcUrl: 'https://cloudflare-eth.com' }
-    const polygon = { chainId: 137, name: 'Polygon', currency: 'MATIC', explorerUrl: 'https://polygonscan.com', rpcUrl: 'https://polygon-rpc.com' }
-    const bsc = { chainId: 56, name: 'BNB Smart Chain', currency: 'BNB', explorerUrl: 'https://bscscan.com', rpcUrl: 'https://binance.onfinality.io/public' }
+    const supportedChains = [
+        { chainId: 1, name: 'Ethereum', currency: 'ETH', explorerUrl: 'https://etherscan.io', rpcUrl: 'https://cloudflare-eth.com' },
+        { chainId: 137, name: 'Polygon', currency: 'MATIC', explorerUrl: 'https://polygonscan.com', rpcUrl: 'https://polygon-rpc.com' },
+        { chainId: 56, name: 'BNB Chain', currency: 'BNB', explorerUrl: 'https://bscscan.com', rpcUrl: 'https://bsc-dataseed.binance.org' },
+        { chainId: 43114, name: 'Avalanche', currency: 'AVAX', explorerUrl: 'https://snowtrace.io', rpcUrl: 'https://api.avax.network/ext/bc/C/rpc' },
+        { chainId: 42161, name: 'Arbitrum', currency: 'ETH', explorerUrl: 'https://arbiscan.io', rpcUrl: 'https://arb1.arbitrum.io/rpc' },
+        { chainId: 10, name: 'Optimism', currency: 'ETH', explorerUrl: 'https://optimistic.etherscan.io', rpcUrl: 'https://mainnet.optimism.io' },
+        { chainId: 8453, name: 'Base', currency: 'ETH', explorerUrl: 'https://basescan.org', rpcUrl: 'https://mainnet.base.org' },
+        { chainId: 11155111, name: 'Sepolia', currency: 'ETH', explorerUrl: 'https://sepolia.etherscan.io', rpcUrl: 'https://rpc.sepolia.org' }
+    ]
 
     const metadata = {
-        name: 'Smart Network DApp',
-        description: 'Auto-updating currency example',
+        name: 'Pro Crypto App',
+        description: 'Universal Payment Interface',
         url: 'https://my-dapp.com', 
         icons: ['https://avatars.githubusercontent.com/u/37784886']
     }
 
     const modal = createWeb3Modal({
         ethersConfig: defaultConfig({ metadata }),
-        chains: [mainnet, polygon, bsc], // Supports ETH, Polygon, and BSC
+        chains: supportedChains,
         projectId,
-        enableAnalytics: true
+        enableAnalytics: true,
+        themeMode: 'dark', // Force Dark Mode for the modal too
+        themeVariables: {
+            '--w3m-accent': '#3b82f6', // Match our blue button
+            '--w3m-border-radius-master': '1px'
+        }
     })
 
-    // UI Elements
-    const statusBox = document.getElementById('status-box')
-    const addressLabel = document.getElementById('wallet-address')
+    // --- UI ELEMENTS ---
     const paymentArea = document.getElementById('payment-area')
-    const networkBadge = document.getElementById('network-badge')
+    const netBadge = document.getElementById('net-badge')
+    const statusBadge = document.getElementById('status-badge')
     const currencyLabel = document.getElementById('currency-label')
     const sendBtn = document.getElementById('send-btn')
 
-    // 4. Helper Function to Update UI
-    function updateNetworkUI(chainId) {
-        if (!chainId) {
-            networkBadge.innerText = "Not Connected"
-            networkBadge.className = "network-badge"
+    // --- LOGIC ---
+    function updateUI(chainId, isConnected) {
+        if (!isConnected) {
+            paymentArea.style.display = 'none'
+            statusBadge.innerText = "Disconnected"
+            statusBadge.classList.remove('active')
+            netBadge.innerText = "No Network"
+            netBadge.classList.remove('active')
             return
         }
 
-        // Find which network we are on
-        let networkName = "Unknown Network"
-        let symbol = "Tokens"
+        const chain = supportedChains.find(c => c.chainId === Number(chainId))
 
-        if (chainId === 1) { networkName = "Ethereum"; symbol = "ETH"; }
-        else if (chainId === 137) { networkName = "Polygon"; symbol = "MATIC"; }
-        else if (chainId === 56) { networkName = "BSC"; symbol = "BNB"; }
+        statusBadge.innerText = "Connected"
+        statusBadge.classList.add('active')
+        paymentArea.style.display = 'block'
 
-        // Update the screen
-        networkBadge.innerText = `📡 ${networkName}`
-        networkBadge.className = "network-badge active"
-        currencyLabel.innerText = `Amount (${symbol})`
-        sendBtn.innerText = `💸 Send ${symbol}`
+        if (chain) {
+            netBadge.innerText = chain.name
+            netBadge.classList.add('active')
+            currencyLabel.innerText = `Amount (${chain.currency})`
+            sendBtn.innerText = `Send ${chain.currency}`
+        } else {
+            netBadge.innerText = `ID: ${chainId}`
+            netBadge.classList.remove('active')
+            currencyLabel.innerText = `Amount`
+            sendBtn.innerText = `Send Transaction`
+        }
     }
 
-    // 5. Advanced Listener (Watches for Address AND Chain changes)
-    modal.subscribeProvider(({ address, isConnected, chainId }) => {
-        if (isConnected && address) {
-            statusBox.style.display = 'block'
-            paymentArea.style.display = 'block'
-            addressLabel.textContent = address
-            
-            // Run our new network update logic
-            updateNetworkUI(chainId)
-        } else {
-            statusBox.style.display = 'none'
-            paymentArea.style.display = 'none'
-            updateNetworkUI(null)
-        }
+    modal.subscribeProvider(({ isConnected, chainId }) => {
+        updateUI(chainId, isConnected)
     })
 
-    // Send Logic (Same as before)
     sendBtn.addEventListener('click', async () => {
         const to = document.getElementById('to-address').value
         const amount = document.getElementById('amount').value
-        if(!to || !amount) return alert("Please fill in fields")
+        
+        if(!to || !amount) {
+            sendBtn.style.background = '#ef4444' // Red flash
+            setTimeout(() => sendBtn.style.background = '', 500)
+            return
+        }
 
         try {
+            sendBtn.innerText = "Confirm on Wallet..."
+            sendBtn.disabled = true
+            
             const walletProvider = modal.getWalletProvider()
             const provider = new BrowserProvider(walletProvider)
             const signer = await provider.getSigner()
@@ -201,10 +274,21 @@
                 to: to,
                 value: parseEther(amount)
             })
-            alert(`✅ Transaction Sent! Hash: ${tx.hash}`)
+            
+            sendBtn.innerText = "Sent! 🚀"
+            sendBtn.style.background = '#10b981' // Green
+            alert(`Success! Hash: ${tx.hash}`)
+            
         } catch (error) {
             console.error(error)
-            alert("Transaction cancelled or failed.")
+            sendBtn.innerText = "Failed ❌"
+            setTimeout(() => {
+                const chainId = modal.getChainId()
+                const chain = supportedChains.find(c => c.chainId === Number(chainId))
+                sendBtn.innerText = chain ? `Send ${chain.currency}` : "Send"
+                sendBtn.style.background = ''
+                sendBtn.disabled = false
+            }, 2000)
         }
     })
 </script>
